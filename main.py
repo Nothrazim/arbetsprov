@@ -2,13 +2,12 @@ import random
 import time
 from card import *
 from creature import *
-# from map import *
+from map import Map
 from player import *
 
 
-
 def handle_input():
-    return input("Choice: ")
+    return input(">>: ")
 
 
 def choose_map():
@@ -18,7 +17,7 @@ def choose_map():
           "\t3. Temple of the Elements\n"
           "\t4: Shrine of Past Gods")
     # Something goes here to either fetch map generation or just make fancy name print
-    map_choice = handle_input()
+    map_choice = int(handle_input())
     return map_choice
 
 
@@ -48,11 +47,21 @@ def choose_num_heroes():
         print("You can play up to 4 players at one time. How many players do you want?")
         try:
             num_heroes = int(handle_input())
-            if num_heroes > 1:
-                if num_heroes < 5:
-                    break
+            if num_heroes >= 2:
+                if num_heroes > 2:
+                    if num_heroes < 5:
+                        print("add hero 3")
+                        # p_list.append(player3)
+                        if num_heroes == 4:
+                            print("add hero 4")
+                            # p_list.append(player4)
+                            break
+                        else:
+                            break
+                    else:
+                        print("Too many heroes. Try again.")
                 else:
-                    print("Too many heroes. Try again.")
+                    break  # Don't add additional heroes if there are only 2
             else:
                 print("You need more heroes. Try again.")
         except ValueError:
@@ -60,115 +69,133 @@ def choose_num_heroes():
     return num_heroes
 
 
+def show_player_list(p_list):
+    print("player list is:")
+    for p in p_list:
+        print(p.name)
+        if p.hero is not "":
+            print("Hero:", p.hero.name)
+        else:
+            print("no hero selected")
+
+
+def apply_hero(player, choice):
+    if choice == 0:
+        player.hero = hero_jarax
+    elif choice == 1:
+        player.hero = hero_hitler
+    elif choice == 2:
+        player.hero = hero_stalin
+    else:
+        print("ended in else on Apply Hero, not good")
+
+
 def main_menu():
+    p_list = [player1, player2]
+    map_choice = 0  # Default
 
     menu_dict = {
-        "a": "Choose Map",
-        "b": "Choose player #1 Hero",
-        "c": "Choose player #2 Hero",
-        "d": "Choose player #3 Hero",
-        "e": "Choose player #4 Hero",
-        "f": "Choose number of Heroes",
-        "g": "Quit",
-        "h": "Start Game!",
+        "Map": [500, "Choose Map", choose_map],
+        "Player #1 Hero": [22000, "Choose player #1 Hero", choose_hero],
+        "Player #2 Hero": [1546, "Choose player #2 Hero", choose_hero],
+        "Player #3 Hero": [16798, "Choose player #3 Hero", choose_hero],
+        "Player #4 Hero": [1876, "Choose player #4 Hero", choose_hero],
+        "Num of Heroes": [1100, "Choose number of Heroes", choose_num_heroes],
+        "Quit": [6871, "Quit", quit],
+        "Game Start": [1987, "Start the Game!", game_loop],
+        "Player List": [154, "Show List of Players", show_player_list],
     }
-    player_list = [player1, player2]
-    start_game_list = [0, player_list]  # Map choice, p1 hero, p2 hero
     # Something needs to check that all players have chosen hero.
 
     # +neutral deck shenanigans?
 
     while True:
-        print("There are", len(player_list), "players.")
         menu_options = []
         x = 0
-        temp_menu_dict = menu_dict
-        for value in temp_menu_dict:
-            if menu_dict[value] == "Start Game!":
-                pass
-            if value is "d":
-                if len(player_list) < 3:
-                    print("I did not add a third hero.")
-                    pass
+        for value in menu_dict:
+            if value == "Player #3 Hero":
+                if len(p_list) < 3:  # No third hero added
+                    menu_dict[value][0] = 20000
                 else:
-                    print("I have appended player 3 the menu.")
                     menu_options.append(menu_dict[value])
                     x += 1
-                    if len(player_list) is 4:
-                        print("I have appended player 4 to the menu.")
-                        menu_options.append(menu_dict[value])
-                        x += 1
-            elif value is "e":
-                if len(player_list) is not 4:
-                    print("I did not add a fourth hero.")
-                    pass
+                    menu_dict[value][0] = x
+            elif value == "Player #4 Hero":
+                if len(p_list) is not 4:  # No fourth hero added
+                    menu_dict[value][0] = 2000
                 else:
-                    print("I have appended value", value, "to the menu.")
                     menu_options.append(menu_dict[value])
                     x += 1
+                    menu_dict[value][0] = x
             else:
-                # print("Key:", value)
-                # print("Choice:", menu_dict[value])
-                # print("Dict X:", menu_dict[x])
-                menu_options.append(menu_dict[value])
+                menu_options.append(value)
                 x += 1
+                menu_dict[value][0] = x
 
-        print("\nThe full player list is:")
-        for val in player_list:
-            print("player:", val)
+        print("\n Val printing:")
+        for val in menu_dict:
+            # print(menu_dict[val])
+            if menu_dict[val][0] < 10:  # Doesn't show 'hidden' options arbitrary high
+                print(str(menu_dict[val][0])+".", menu_dict[val][1])
+        try:
+            usr_choice = int(handle_input())
 
-        y = 0
-        print("\ntime to print menu options")
-        for val in menu_options:
-            y += 1
-            print(str(y)+".", val)
+            for val in menu_dict:
+                if usr_choice == menu_dict[val][0]:
 
-        usr_choice = handle_input()
+                    if val == "Game Start":
+                        if map_choice > 0:  # Map must be chosen
+                            p_number = 0
+                            for p in p_list:
+                                if p.hero == "":
+                                    pass
+                                else:
+                                    p_number += 1
+                            if p_number == len(p_list):
+                                game_loop(p_list, map_choice)
+                            else:
+                                for p in p_list:
+                                    if p.hero == "":
+                                        print(p.name, "has yet to choose a hero!")
+                        else:
+                            print("You must select a map before starting the game!")
 
-        if usr_choice == "1":
-            map_choice = choose_map()
-            print("You have chosen", map_choice)
+                    elif val == "Player List":
+                        menu_dict[val][2](p_list)
 
-        elif usr_choice == "2":
-            p1_hero = choose_hero()
-        # Use AI
-        elif usr_choice == "3":
-            p2_hero = choose_hero()
-        # Highscore
+                    elif val == "Map":
+                        map_choice = menu_dict[val][2]()
+                        print("map chosen is", map_choice)
+                    elif menu_dict[val][2] is choose_hero:
+                        return_value = menu_dict[val][2]()
+                        if val == "Player #1 Hero":
+                            apply_hero(player1, return_value)
+                        elif val == "Player #2 Hero":
+                            apply_hero(player2, return_value)
+                        elif val == "Player #3 Hero":
+                            apply_hero(player3, return_value)
+                        elif val == "Player #4 Hero":
+                            apply_hero(player4, return_value)
+                        else:
+                            print("ended in else for resolution for choose hero")
+                    elif val == "Num of Heroes":
+                        return_value = menu_dict[val][2]()
+                        p_list = [player1, player2]
+                        if return_value >= 3:
+                            p_list.append(player3)
+                            if return_value == 4:
+                                p_list.append(player4)
+                    else:
+                        menu_dict[val][2]()
 
-        elif usr_choice == "4":
-            player_list = [player1, player2]
-            num = choose_num_heroes()
-            if num > 2:
-                player_list.append(player3)
-                if num == 4:
-                    player_list.append(player4)
-            else:
-                print("Didn't add any heroes.")
-            # self.view.print_main_menu(self.get_top_highschores(), View.enter_go_back, error=True)
-            # self.view.handle_input()  # ENTER TO CONTINUE
-            # self.main_menu()
-
-        # Quit
-        elif usr_choice == "5":
-            print("Good bye!")
-            time.sleep(1.2)
-            quit()
-        else:
-            print("I cannot understand that. Try again.")
-
-        """
-        Replace this \/ with logic checking everything is OK, breaking when needed
-        Alternatively, split into only displaying START GAME option when logic is OK
-        Then  
-        """
-        if start_game_list is 0:
-            break
-    game_loop()
+        except ValueError:
+            print("Please enter a number.")
 
 
-def game_loop():
+def game_loop(player_list):
     print("I am a game loop!")
+    for player in player_list:
+        print(player.name+", it is your turn.")
 # Destroy all creatures
 # move self
 # deal damage in line
@@ -183,8 +210,5 @@ def game_loop():
 # destroy target equipment
 #
 
-player_list = [player1, player2]
 
 main_menu()
-
-game_loop()
