@@ -1,0 +1,112 @@
+    How to play
+
+Rule number 1: If a card and a rule is in conflict always refer to the card.
+
+  Starting the game
+
+Before the game begins a map must be chosen, also each player must choose a hero (or give one to them randomly) and shuffle their respective decks (take this time to also shuffle the neutral deck).
+Once the decks are all shuffled determine the starting player by rolling a die where the player with the highest roll starts.
+Starting with the player on the starting players right and going counter-clockwise around the table place your heroes in the designated starting zones on the chosen map, with no more then one hero per starting zone. 
+Each player draws four cards from their respective decks.
+
+  The Turn
+
+A turn always starts with what one might call the setup.
+  Certain aspects of the setup must happen in the following order:
+The player whose turn it is draws a card,
+then resolve any ”at the start of turn” effects from cards or abilities,
+finally generate resource for the player whose turn it is.
+Cards may be played between each of these steps.
+
+After the setup is complete the game falls into the hands of the players and the player whose turn it is gets to use both his attack, move action and resources as he/she pleases.
+A turn may be ended at any point after the setup is complete.
+
+  Playing the game
+
+At the start of any turn except the first one, you must draw a card before taking any other action.
+After drawing a card you have one attack action and one move action to play.
+You are not required to use up both your actions before ending your turn.
+Free actions are actions that can be used anytime you want.
+Once a player has ended his/her turn any remaining move or attack actions are forfeit.
+Cards can be played even if it is not your turn however they do not resolve until the end of turn, meaning that a well spent move action could be enough to move a character out of range.
+You may target units outside the range of a card, however if the target remains out of range by the time the card resolves the card has no effect.
+Cards that target spells may only target spells in the resolve order.
+Since spells only resolve at the end of turn creatures summoned from cards will have to wait until the next turn to act.
+All creatures on the board each have one attack and one move action.
+
+	Basic Moves
+
+Attack with hero (attack action)
+Move with hero (move action)
+Discard an equipped card (move action)
+Use hero ability (usually attack action)
+
+  Card Designations
+
+Cards have many different types and each different type interact with the game differently.
+
+Equipment – Not a spell, cant be countered – Active abilities can be countered – Has no resource cost, instead uses a move action to equip – Any Abilities an Equipment card possess may be used when that item is equipped
+Constant - Spell can be countered – Effect can be dispelled – Comes in three different forms Hero Enchant, Equipment Enchant, and World Enchant.
+Summon - Spell can be countered – Creatures summoned can be destroyed
+Ability - Spell can be countered
+Curse – Spell can be countered – Effect can be dispelled – Comes in three different forms Hero Enchant, Equipment Enchant, and World Enchant.
+
+Hero Enchant cards enchant your hero and gives them some special benefit, usually statistic boosts, auras, or resource generation.
+Equipment Enchant cards must be played on a piece of equipment, if the equpment the Equipment Enchant card is affecting is destroyed, discarded, removed from play, or otherwise unequipped the Equipment Enchant card is discarded.
+World Enchant cards include effects that affect the entire battlefield, usually increase/decrease statistics of a perticular unit type or increase/decrease Ambient Mana
+
+  Card Qualities
+
+Card Qualities are keywords tied to rules that give certain cards special effects. As long as a card has a Card Quality keyword in its description it operates under those special rules.
+
+Quick: You may have this card take any position in the resolve order.
+Exceptional: Can only be affected by an exceptional effect.
+Deliberate: Can only be cast during your turn.
+
+  Units, Types, and Abilities
+
+Any entity that on the board is a unit, however some units have special types attached to them akin to ”creature, mechanical, living, or undead”
+All units have different types, and dependent on a units type they can be affected by different effects.
+E.g. a spell states ”deal 4 damage to target creature.”
+A Zombie is an undead creature and as such is a valid target for this spell.
+A Cloning Vats is a Mechanical Unit and as such will not cannot be targeted by this spell.
+Some units have special abilities, some of these abilities can be activated others are passive, or just activate under certain conditions.
+All abilities that activate can be countered via any spell that ”counters target spell.”
+
+  Battlefields and Treasure
+
+Battlefields are simply enough the board that the match takes place on.
+Each battlefield is a unique composition of impassable terrain, treasure chests, and a single statistic Ambient Mana.
+Ambient Mana mostly affects adepts, but some heroes make use of it in different ways.
+Treasure chests are special locations on the board, if your hero moves over these areas as a part of their movement draw a card from the neutral deck.
+Treasue chest cannot be activated by non-heroic units
+Once a treasure chest has been activated it becomes dormant and stays as such until all treasure chests have been activated.
+A dormant treasure chest does not grant any card draw when moved over.
+
+  Resolve Order
+
+Cards are resolved in the order they are played when the turn ends.
+Effectivly a turn only represents how events would play out and at the end of turn everything ”happens” so to speak.
+If you have a constant effect in play refer to the card as to when and how its effect resolves.
+
+Line of Sight
+
+If you can draw a straight line from any point of your character to your target then you are considered to have line of sight.
+
+Hero ”class” and Resources
+
+All heroes have a ”class” and each ”class” make use of there own type of resource.
+Overall there are three ”classes”, Brute, Adept, and Expert. Brutes make use of the resource Fury, Adepts use Mana, and Experts use Action points.
+
+Fury: A Brute starts the match with 0 Fury and use cards and/or its hero ability to generate Fury.
+Fury can then be spent on cards and/or hero abilities that cost Fury.
+A Brute can have as much Fury as it is able to generate, there is no maximum cap.
+
+Mana: An Adept starts the match with an amount of Mana equal to the Ambient Mana statistic of the battlefield.
+At the start of the Adepts turn it generates an amount of Mana equal to the heroes Mana Generation statistic.
+Adepts can store an amount of Mana equal to its Mana Cap statistic, any Mana generated in excess is lost.
+
+Action Points: An Expert starts every turn with a set amount of Action Points equal to its Action Points statistic.
+Example: Tim starts his turn with 4 action point and during the turn he uses 2 to cast a spell and then ends the turn.
+During his opponents turn he cast a counterspell for 1 action point so just before his turn he has 1 left.
+His opponent ends their turn and Tim starts his next turn with 4 action points even though he had 1 left at the end of his opponents turn.
