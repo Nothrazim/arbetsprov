@@ -12,12 +12,6 @@ def shuffle_deck(deck):
     random.shuffle(deck)
 
 
-def print_cards_in_deck(deck):
-    print("\nList of cards in deck:")
-    for card in deck:
-        print(card.name)
-
-
 def draw_card(hand, deck):
     print("I have now drawn a card.")
     hand.append(deck[0])
@@ -110,7 +104,14 @@ stalin_deck = [card_stalin_absolute_zero, card_stalin_bear_arms, card_stalin_ble
                card_stalin_aurora_chargeblade, card_stalin_crown_of_ice, card_stalin_heart_of_winter,
                card_stalin_ice_armor, card_stalin_leggings, card_stalin_motherlands_protection, card_stalin_pernach]
 
-hitler_deck = []
+hitler_deck = [card_jarax_araghast, card_jarax_blood_god, card_jarax_blood_rain, card_jarax_bloodforged_armor,
+               card_jarax_bloodthirster_helmet, card_jarax_champions_greaves, card_jarax_chosen, card_jarax_cleave,
+               card_jarax_dark_cabal, card_jarax_dark_machinery, card_jarax_dreadnought, card_jarax_fire_from_sky,
+               card_jarax_fist, card_jarax_forsworn, card_jarax_fusion, card_jarax_harvesters, card_jarax_hounds,
+               card_jarax_juggernaut, card_jarax_hand_of_the_warmaster, card_jarax_legion_moves,
+               card_jarax_lord_of_blood, card_jarax_magic_weak, card_jarax_rampagers, card_jarax_ritual_of_eight,
+               card_jarax_sear_soul, card_jarax_severing_blow, card_jarax_skull_don_throne,
+               card_jarax_soulstealer_hammer, card_jarax_to_the_hunt, card_jarax_unholy_engineering]
 
 card_neutral_cosmic_reshaping = Card("Cosmic Reshaping", 0)
 card_neutral_dark_summons = Card("Dark Summons", 0)

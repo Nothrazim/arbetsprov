@@ -6,12 +6,29 @@ class Player:
         self.hero = hero
         self.deck = []
         self.hand = []
+        self.discard = []
 
     def shuffle_deck(self):
         random.shuffle(self.deck)
 
     def draw_card(self):
         self.hand.append(self.deck.pop(0))
+
+    def print_cards_in_deck(self):
+        for card in self.deck:
+            print(card.name)
+
+    def print_cards_in_hand(self):
+        for card in self.hand:
+            print("Cost:", str(card.cost), "\t", card.name)
+
+    def look_at_deck(self, card_num):
+        print(self.name, "is looking at the top", card_num, "card(s) of a deck.")
+        to_look_at = []
+        for i in range(0, card_num):
+            to_look_at.append(self.deck[i])
+        for card in to_look_at:
+            print(card.name)
 
     def card_effect_quick(self):
         while True:
@@ -40,22 +57,39 @@ class Player:
             else:
                 print("Select a valid number.")
 
-    def generate_resources(self, hero):
-        temp = hero.current_energy
-        if hero.hero_class == "Adept":
-            hero.current_energy += hero.energy_regen
-        elif hero.hero_class == "Expert":
-            hero.current_energy = hero.energy_regen
-        if hero.current_energy > hero.energy_cap and hero.hero_class is not "Brute":
-            hero.current_energy = hero.energy_cap
-        if hero.current_energy > temp:
-            print(self.name, "has gained", hero.current_energy-temp, hero.energy_type+".")
-
-
     def choose_card(self):
-        while True:
-            menu_options = []
-            x = 0
+        # while True:
+        hand_dict = {}
+        hand_dict.clear()
+        hand_dict = {
+            "no card": [1, "Do not play any cards"]
+        }
+        x = 1
+        for card in self.hand:
+            x += 1
+            hand_dict[card] = x, card.name
+
+        for thing in hand_dict:
+            if thing == "no card":
+                print(str(hand_dict[thing][0])+".", hand_dict[thing][1])
+            else:
+                print(str(hand_dict[thing][0])+".", thing.name)
+
+        try:
+            usr_choice = int(input())
+
+            for val in hand_dict:
+                if usr_choice == hand_dict[val][0]:
+                    if val == "no card":
+                        print("no")
+                    else:
+                        print("You have chosen to play", val.name+".")
+                        return val
+
+        except ValueError:
+            print("Please enter a number.")
+
+        """
             for value in menu_dict:
                 if value == "Player #3 Hero":
                     if len(p_list) < 3:  # No third hero added
@@ -131,10 +165,10 @@ class Player:
                                     p_list.append(player4)
                         else:
                             menu_dict[val][2]()
-
+                
             except ValueError:
                 print("Please enter a number.")
-
+            """
 
 player1 = Player("Alice")
 player2 = Player("Bob")

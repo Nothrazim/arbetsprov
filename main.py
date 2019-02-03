@@ -71,22 +71,22 @@ def choose_num_heroes():
 def show_player_list(p_list):
     print("Player list:")
     for p in p_list:
-        print("\n"+ p.name)
+        print(p.name)
         if p.hero is not "":
-            print("Hero:", p.hero.name)
+            print("Hero:", p.hero.name + "\n")
         else:
-            print( p.name, "has not selected a Hero yet.")
+            print(p.name, "has not selected a Hero yet.\n")
 
 
 def apply_hero(player, choice):
     if choice == 0:
-        player.hero = hero_jarax
+        player.hero = Hero("Jarax", 30, 2, 3, 1, 4, "berzerk", "Brute", 999, 0)
         player.deck = jarax_deck
     elif choice == 1:
-        player.hero = hero_hitler
+        player.hero = Hero("Hitler Nechromancer", 10, 0, 2, 4, 4, "raise_dead", "Adept", 12, 3)
         player.deck = hitler_deck
     elif choice == 2:
-        player.hero = hero_stalin
+        player.hero = Hero("Stalin", 20, 0, 1, 1, 4, "beast_shape", "Adept", 11, 3)
         player.deck = stalin_deck
     else:
         print("ended in else on Apply Hero, not good")
@@ -111,25 +111,21 @@ def main_menu():
     # Should there be neutral deck choices?
 
     while True:
-        menu_options = []
         x = 0
         for value in menu_dict:
             if value == "Player #3 Hero":
                 if len(p_list) < 3:  # No third hero added
                     menu_dict[value][0] = 20000
                 else:
-                    menu_options.append(menu_dict[value])
                     x += 1
                     menu_dict[value][0] = x
             elif value == "Player #4 Hero":
                 if len(p_list) is not 4:  # No fourth hero added
                     menu_dict[value][0] = 2000
                 else:
-                    menu_options.append(menu_dict[value])
                     x += 1
                     menu_dict[value][0] = x
             else:
-                menu_options.append(value)
                 x += 1
                 menu_dict[value][0] = x
 
@@ -196,7 +192,6 @@ def main_menu():
 def init_game(player_list, map_choice):
     print("I am the initiation!")
 
-
     init_list = []
     shuffle_deck(neutral_deck)
     for player in player_list:
@@ -210,7 +205,8 @@ def init_game(player_list, map_choice):
         player.draw_card()
         player.draw_card()
         for card in player.hand:
-            print(player.name, "has drawn", card.name)
+            print(player.name, "has drawn", card.name + ".")
+        print("")
 
     # for player in player_list:
         # choose start loc
@@ -223,21 +219,35 @@ def init_game(player_list, map_choice):
 def game_turn(player_list, turn_count):  # Also needs to receive map.
     while True:
         turn_count += 1
-        print("I am a game loop!")
+        print("\t\tTURN", turn_count)
+
+        resolve_order = []
+
         for player in player_list:
             print("")
             print(player.name+", it is your turn.")
-            print(player.name, "currently has", player.hero.current_energy, player.hero.energy_type+".")
-            # offer_cards(player_list)
+            print(player.name+", you have", player.hero.current_energy, player.hero.energy_type+".")
+            resolve_order.append(offer_cards(player_list))
+
             player.draw_card()
+            print(player.name, "has drawn", player.hand[-1].name + ".")
+
             # offer_cards(player_list)
+
             print("This is where start-of-turn (maintenance) effects should occur.")
+
             # offer_cards(player_list)
-            player.generate_resources(player.hero)
+
+            player.hero.generate_resources(player)
+
             # offer_cards(player_list)
+
             # Movement + Attacks
+
             # offer_cards(player_list)
+
             # Resolve all effects
+
             print("End of turn.")
             print(player.name, "currently has", player.hero.current_energy, player.hero.energy_type+".")
             print("")
@@ -257,13 +267,48 @@ def game_turn(player_list, turn_count):  # Also needs to receive map.
 
 
 def offer_cards(player_list):
+    return_list = []
     for player in player_list:
+        x = 0
         if len(player.hand) > 0:
             for card in player.hand:
                 if card.cost > player.hero.current_energy:
                     pass
                 else:
-                    print(player.name, "can play", card.name)
+                    x += 1
+        if x > 0:
+            while True:
+                print(player.name + ", do you want to play any cards?"
+                                    "\n[Y]es to play cards."
+                                    "\n[V]iew cards to view cards")
+                inp = handle_input()
+                inp = inp.lower()[:1]
+                if inp == "y":
+                    card = player.choose_card()
+                    if type(card) == Card:
+                        print(player.name, "has chosen to play", card.name)
+                        return_list.append(card)
+                    break
+                elif inp == "v":
+                    player.print_cards_in_hand()
+                elif inp == "":
+                    pass
+                else:
+                    break
+    return return_list
+
+
+player_dummy = Player("dummy")
+player_dummy.hero = Hero("Hitler Nechromancer", 10, 0, 2, 4, 4, "raise_dead", "Adept", 12, 3)
+player_dummy.deck = hitler_deck
+player_dummy.hand = [card_jarax_sear_soul, card_jarax_unholy_engineering, card_jarax_skull_don_throne,
+                     card_jarax_blood_god, card_stalin_crown_of_ice, card_stalin_absolute_zero,
+                     card_stalin_motherlands_protection, card_jarax_soulstealer_hammer]
+player_dummy.hero.current_energy = 4
+# card = player_dummy.choose_card()
+# print("the card chosen was", card.name)
+
+main_menu()
 
 
 # Destroy all creatures
@@ -279,6 +324,3 @@ def offer_cards(player_list):
 # heal
 # destroy target equipment
 #
-
-main_menu()
-
