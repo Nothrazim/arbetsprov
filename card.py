@@ -19,10 +19,10 @@ def print_cards_in_deck(deck):
 
 
 def draw_card(hand, deck):
-    randomized_card = random.randrange(0, len(deck)-1)
-    hand.append(deck[randomized_card])
-    print("i have drawn \"" + deck[randomized_card].name + "\"")
-    deck.pop(randomized_card)
+    print("I have now drawn a card.")
+    hand.append(deck[0])
+    print("i have drawn \"" + deck[0].name + "\"")
+    deck.pop(0)
 
 
 card_stalin_absolute_zero = Card("Absolute Zero", 5)  # destroy all creatures, exceptional
@@ -57,6 +57,7 @@ card_stalin_leggings = Card("Leggings of the Northern Winds", 0)
 card_stalin_motherlands_protection = Card("Motherland's Protection", 0)
 card_stalin_pernach = Card("Pernach of the Motherland", 0)
 
+
 card_jarax_fusion = Card("A fusion of Brass and Bones", 5)
 card_jarax_blood_god = Card("Blood for the Blood God", 6)
 card_jarax_blood_rain = Card("Blood Rain", 2)
@@ -67,7 +68,7 @@ card_jarax_dark_cabal = Card("Dark Cabal", 2)
 card_jarax_dark_machinery = Card("Dark Machinery", 3)
 card_jarax_dreadnought = Card("Deathwish Dreadnought", 4)
 card_jarax_fire_from_sky = Card("Fire from the Sky", 4)
-card_jarax_kyras = Card("Hand of the Warmaster", 4)
+card_jarax_hand_of_the_warmaster = Card("Hand of the Warmaster", 4)
 card_jarax_harvesters = Card("Harvesters", 2)
 card_jarax_fist = Card("I CAST FIST!", 0)
 card_jarax_juggernaut = Card("Juggernaut", 3)
@@ -94,13 +95,40 @@ jarax_deck = [card_jarax_araghast, card_jarax_blood_god, card_jarax_blood_rain, 
               card_jarax_bloodthirster_helmet, card_jarax_champions_greaves, card_jarax_chosen, card_jarax_cleave,
               card_jarax_dark_cabal, card_jarax_dark_machinery, card_jarax_dreadnought, card_jarax_fire_from_sky,
               card_jarax_fist, card_jarax_forsworn, card_jarax_fusion, card_jarax_harvesters, card_jarax_hounds,
-              card_jarax_juggernaut, card_jarax_kyras, card_jarax_legion_moves, card_jarax_lord_of_blood,
-              card_jarax_magic_weak, card_jarax_rampagers, card_jarax_ritual_of_eight, card_jarax_sear_soul,
-              card_jarax_severing_blow, card_jarax_skull_don_throne, card_jarax_soulstealer_hammer,
-              card_jarax_to_the_hunt, card_jarax_unholy_engineering]
-stalin_deck = []
+              card_jarax_juggernaut, card_jarax_hand_of_the_warmaster, card_jarax_legion_moves,
+              card_jarax_lord_of_blood, card_jarax_magic_weak, card_jarax_rampagers, card_jarax_ritual_of_eight,
+              card_jarax_sear_soul, card_jarax_severing_blow, card_jarax_skull_don_throne,
+              card_jarax_soulstealer_hammer, card_jarax_to_the_hunt, card_jarax_unholy_engineering]
+
+stalin_deck = [card_stalin_absolute_zero, card_stalin_bear_arms, card_stalin_blessing_of_ice,
+               card_stalin_cold_embrace, card_stalin_cold_iron, card_stalin_consume_heat, card_stalin_dire_form,
+               card_stalin_double_strike, card_stalin_frictionless, card_stalin_frigid_transfixion,
+               card_stalin_frozen_field, card_stalin_harsh_winds, card_stalin_ice_shards,
+               card_stalin_northern_light, card_stalin_nuclear_winter, card_stalin_primal_roar,
+               card_stalin_purging_cold, card_stalin_quick_assault, card_stalin_savage_rend,
+               card_stalin_sharpened_claws, card_stalin_shatter, card_stalin_sweep_combo, card_stalin_whiteout,
+               card_stalin_aurora_chargeblade, card_stalin_crown_of_ice, card_stalin_heart_of_winter,
+               card_stalin_ice_armor, card_stalin_leggings, card_stalin_motherlands_protection, card_stalin_pernach]
+
 hitler_deck = []
-neutral_deck = []
+
+card_neutral_cosmic_reshaping = Card("Cosmic Reshaping", 0)
+card_neutral_dark_summons = Card("Dark Summons", 0)
+card_neutral_deja_vu = Card("Deja Vu", 0)
+card_neutral_how_quickly = Card("How Quickly The Tide Turns!", 0)
+
+card_neutral_boots_of_speed = Card("Botos of Speed", 0)
+card_neutral_chargecoil_boots = Card("Chargecoil Boots", 0)
+card_neutral_crown_of_alternate_realities = Card("Crown of Alternate Realities", 0)
+card_neutral_discharge_vest = Card("Discharge Vest", 0)
+card_neutral_dwarven_sabatons = Card("Dwarven Sabatons", 0)
+card_neutral_hatemail = Card("Hatemail", 0)
+card_neutral_lifereaver = Card("Lifereaver", 0)
+
+neutral_deck = [card_neutral_cosmic_reshaping, card_neutral_dark_summons, card_neutral_deja_vu,
+                card_neutral_how_quickly, card_neutral_boots_of_speed, card_neutral_chargecoil_boots,
+                card_neutral_crown_of_alternate_realities, card_neutral_discharge_vest, card_neutral_dwarven_sabatons,
+                card_neutral_hatemail, card_neutral_lifereaver]
 
 
 # Destroy all creatures
