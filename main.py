@@ -10,17 +10,27 @@ def handle_input():
 
 
 def choose_map():
-    print("Choose your map!\n"
-          "\t1. Acid Woods\n"
-          "\t2. Blasted Lands\n"
-          "\t3. Temple of the Elements\n"
-          "\t4: Shrine of Past Gods")
-    # Something goes here to either fetch map generation or just make fancy name print
-    map_choice = int(handle_input())
-    return map_choice
+    while True:
+        print("Choose your map!\n"
+              "\t1. Acid Woods\n"
+              "\t2. Blasted Lands\n"
+              "\t3. Temple of the Elements\n"
+              "\t4: Shrine of Past Gods")
+        # Something goes here to either fetch map generation or just make fancy name print
+        try:
+            map_choice = int(handle_input())
+            if map_choice > 0:
+                if map_choice < 5:
+                    return map_choice
+                else:
+                    print("Please choose a valid map.")
+            else:
+                print("Please choose a valid map.")
+        except ValueError:
+            print("That is not a map.")
 
 
-def choose_hero():
+def choose_hero(player):
     while True:
         x = 0
         print("")
@@ -29,16 +39,39 @@ def choose_hero():
             print(str(x)+".", hero.name)
         print(str(x+1)+". Random Hero")
         try:
-            hero_choice = int(handle_input()) - 1
-            if hero_choice == len(hero_list):  # Randomizes hero
-                hero_choice = random.randrange(0, len(hero_list)-1)
-                print("You have randomized:", hero_list[hero_choice].name)
+            hero_choice = int(handle_input())
+            if hero_choice == 1:
+                player.hero = Hero("Jarax", 30, 2, 3, 1, 4, "berzerk", "Brute", 999, 0)
+                player.deck = jarax_deck
+                print("You have chosen", player.hero.name)
+                break
+            elif hero_choice == 2:
+                player.hero = Hero("Hitler Nechromancer", 10, 0, 2, 4, 4, "raise_dead", "Adept", 12, 3)
+                player.deck = hitler_deck
+                print("You have chosen", player.hero.name)
+                break
+            elif hero_choice == 3:
+                player.hero = Hero("Stalin", 20, 0, 1, 1, 4, "beast_shape", "Adept", 11, 3)
+                player.deck = stalin_deck
+                print("You have chosen", player.hero.name)
+                break
+            elif hero_choice == 4:
+                rand = random.randrange(0, len(hero_list))
+                if rand == 0:
+                    player.hero = Hero("Jarax", 30, 2, 3, 1, 4, "berzerk", "Brute", 999, 0)
+                    player.deck = jarax_deck
+                elif rand == 1:
+                    player.hero = Hero("Hitler Nechromancer", 10, 0, 2, 4, 4, "raise_dead", "Adept", 12, 3)
+                    player.deck = hitler_deck
+                elif rand == 2:
+                    player.hero = Hero("Stalin", 20, 0, 1, 1, 4, "beast_shape", "Adept", 11, 3)
+                    player.deck = stalin_deck
+                print("You have randomized", player.hero.name)
+                break
             else:
-                print("You have chosen to play as", hero_list[hero_choice].name)
-            break
-        except IndexError:
-            print("That does not correspond to any hero i know. Try again.")
-    return hero_choice
+                print("That is not a valid choice. Try again.")
+        except ValueError:
+            print("That is not a number. Try again.")
 
 
 def choose_num_heroes():
@@ -78,20 +111,6 @@ def show_player_list(p_list):
             print(p.name, "has not selected a Hero yet.\n")
 
 
-def apply_hero(player, choice):
-    if choice == 0:
-        player.hero = Hero("Jarax", 30, 2, 3, 1, 4, "berzerk", "Brute", 999, 0)
-        player.deck = jarax_deck
-    elif choice == 1:
-        player.hero = Hero("Hitler Nechromancer", 10, 0, 2, 4, 4, "raise_dead", "Adept", 12, 3)
-        player.deck = hitler_deck
-    elif choice == 2:
-        player.hero = Hero("Stalin", 20, 0, 1, 1, 4, "beast_shape", "Adept", 11, 3)
-        player.deck = stalin_deck
-    else:
-        print("ended in else on Apply Hero, not good")
-
-
 def main_menu():
     p_list = [player1, player2]
     map_choice = 0  # Default
@@ -110,6 +129,7 @@ def main_menu():
 
     # Should there be neutral deck choices?
 
+    """Fix so that it traps player if incorrect input (too high number)"""
     while True:
         x = 0
         for value in menu_dict:
@@ -131,13 +151,13 @@ def main_menu():
 
         # Clear screen needed
         for val in menu_dict:
-            # print(menu_dict[val])
             if menu_dict[val][0] < 100:  # Doesn't show 'hidden' options (with arbitrarily high values)
                 print(str(menu_dict[val][0])+".", menu_dict[val][1])
         try:
             usr_choice = int(handle_input())
 
             for val in menu_dict:
+
                 if usr_choice == menu_dict[val][0]:
 
                     if val == "Game Start":
@@ -164,15 +184,15 @@ def main_menu():
                         map_choice = menu_dict[val][2]()
                         print("map chosen is", map_choice)
                     elif menu_dict[val][2] is choose_hero:
-                        return_value = menu_dict[val][2]()
+                        # return_value = menu_dict[val][2]()
                         if val == "Player #1 Hero":
-                            apply_hero(player1, return_value)
+                            choose_hero(player1)
                         elif val == "Player #2 Hero":
-                            apply_hero(player2, return_value)
+                            choose_hero(player2)
                         elif val == "Player #3 Hero":
-                            apply_hero(player3, return_value)
+                            choose_hero(player3)
                         elif val == "Player #4 Hero":
-                            apply_hero(player4, return_value)
+                            choose_hero(player4)
                         else:
                             print("ended in else for resolution for choose hero")
                     elif val == "Num of Heroes":
@@ -192,12 +212,14 @@ def main_menu():
 def init_game(player_list, map_choice):
     print("I am the initiation!")
 
-    init_list = []
+    # init_list = []
+
     shuffle_deck(neutral_deck)
     for player in player_list:
         player.shuffle_deck()
-        init = random.randrange(1, 6)
-        init_list.append(init)
+        # init = random.randrange(1, 6)
+        # init_list.append(init)
+        """init_list not used right now"""
 
     for player in player_list:
         player.draw_card()
@@ -222,6 +244,15 @@ def game_turn(player_list, turn_count):  # Also needs to receive map.
         print("\t\tTURN", turn_count)
 
         resolve_order = []
+        """Make list contain all resolve effects (offer cards etc).
+        Loop through, and when one action is done, delete (pop) from list
+        Loop is broken if interrupted but will not replay events it should already have done"""
+
+        """
+        resolve_order = [offer_cards(player_list), draw_card, offer_cards(player_list), "maintenance",
+                         offer_cards(player_list), "gain resources", offer_cards(player_list), "movement+attacks",
+                         offer_cards(player_list), "resolve cards"]
+        """
 
         for player in player_list:
             print("")
@@ -258,12 +289,6 @@ def game_turn(player_list, turn_count):  # Also needs to receive map.
         if turn_count > 1:
             print("end of turn 2")
             break
-
-    """
-    resolve_order = [offer_cards(player_list), draw_card, offer_cards(player_list), "maintenance",
-                     offer_cards(player_list), "gain resources", offer_cards(player_list), "movement+attacks",
-                     offer_cards(player_list), "resolve cards"]
-    """
 
 
 def offer_cards(player_list):
