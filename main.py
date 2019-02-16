@@ -1,59 +1,75 @@
 import random
 import time
+import socket
 from card import *
 from creature import *
 from player import *
+from threading import Thread
+
+HOST = ""  # Standard loopback interface address (localhost)
+PORT = 55555        # Port to listen on (non-privileged ports are > 1023)
 
 
 def handle_input():
-    return input(">> ")
+    data = conn.recv(2048)
+    # reply = addr[0] + " says: " + data.decode("utf-8")
+    # conn.sendall(str.encode(reply))
+    return data
 
 
 def choose_map():
     while True:
-        print("Choose your map!\n"
-              "\t1. Acid Woods\n"
-              "\t2. Blasted Lands\n"
-              "\t3. Temple of the Elements\n"
-              "\t4: Shrine of Past Gods")
+        maps = ("Choose your map!\n"
+                "\t1. Acid Woods\n"
+                "\t2. Blasted Lands\n"
+                "\t3. Temple of the Elements\n"
+                "\t4: Shrine of Past Gods\n")
+        conn.send(str.encode(maps))
         # Something goes here to either fetch map generation or just make fancy name print
         try:
             map_choice = int(handle_input())
             if map_choice > 0:
                 if map_choice < 5:
+                    print("player chose map", map_choice)
                     return map_choice
                 else:
-                    print("Please choose a valid map.")
+                    conn.send(str.encode("Please choose a valid map.\n"))
             else:
+                conn.send(str.encode("Please choose a valid map.\n"))
                 print("Please choose a valid map.")
         except ValueError:
             print("That is not a map.")
+            conn.send(str.encode("That is not a map. Try again.\n"))
 
 
 def choose_hero(player):
     while True:
         x = 0
-        print("")
         for hero in hero_list:
             x += 1
             print(str(x)+".", hero.name)
+            conn.send(str.encode(str(x)+". " + hero.name + "\n"))
         print(str(x+1)+". Random Hero")
+        conn.send(str.encode(str(x+1)+". Random Hero\n"))
         try:
             hero_choice = int(handle_input())
             if hero_choice == 1:
                 player.hero = Hero("Jarax", 30, 2, 3, 1, 4, "berzerk", "Brute", 999, 0)
                 player.deck = jarax_deck
-                print("You have chosen", player.hero.name)
+                print(player.name, "chose", player.hero.name)
+                conn.send(str.encode("You have chosen " + player.hero.name + "\n"))
                 break
             elif hero_choice == 2:
                 player.hero = Hero("Hitler Nechromancer", 10, 0, 2, 4, 4, "raise_dead", "Adept", 12, 3)
                 player.deck = hitler_deck
-                print("You have chosen", player.hero.name)
+                print(player.name, "chose", player.hero.name)
+                conn.send(str.encode("You have chosen " + player.hero.name + "\n"))
                 break
             elif hero_choice == 3:
                 player.hero = Hero("Stalin", 20, 0, 1, 1, 4, "beast_shape", "Adept", 11, 3)
                 player.deck = stalin_deck
-                print("You have chosen", player.hero.name)
+                print(player.name, "chose", player.hero.name)
+                conn.send(str.encode("You have chosen " + player.hero.name + "\n"))
                 break
             elif hero_choice == 4:
                 rand = random.randrange(0, len(hero_list))
@@ -66,17 +82,19 @@ def choose_hero(player):
                 elif rand == 2:
                     player.hero = Hero("Stalin", 20, 0, 1, 1, 4, "beast_shape", "Adept", 11, 3)
                     player.deck = stalin_deck
-                print("You have randomized", player.hero.name)
+                print(player.name, "randomized", player.hero.name)
+                conn.send(str.encode("You have randomized " + player.hero.name + "\n"))
                 break
             else:
-                print("That is not a valid choice. Try again.")
+                conn.send(str.encode("That is not a valid choice. Try again.\n"))
         except ValueError:
-            print("That is not a number. Try again.")
+            conn.send(str.encode("That is not a valid choice. Try again.\n"))
 
 
-def choose_num_heroes():
+def choose_num_heroes():  # Needs to be rewritten to account for connection of new players
     while True:
         print("You can play up to 4 players at one time. How many players do you want?")
+        conn.send(str.encode("You can play up to 4 players at one time. How many players do you want?"))
         try:
             num_heroes = int(handle_input())
             if num_heroes >= 2:
@@ -101,7 +119,7 @@ def choose_num_heroes():
     return num_heroes
 
 
-def show_player_list(p_list):
+def show_player_list(p_list):  # Needs to be rewritten to account for new players
     print("Player list:")
     for p in p_list:
         print(p.name)
@@ -150,11 +168,17 @@ def main_menu():
                 menu_dict[value][0] = x
 
         # Clear screen needed
+        dummy_handler = 0
         for val in menu_dict:
             if menu_dict[val][0] < 100:  # Doesn't show 'hidden' options (with arbitrarily high values)
+                dummy_handler += 1
                 print(str(menu_dict[val][0])+".", menu_dict[val][1])
+                conn.send(str.encode(str(menu_dict[val][0])+". " + menu_dict[val][1] + "\n"))
         try:
             usr_choice = int(handle_input())
+            if usr_choice > dummy_handler:
+                conn.send(str.encode("That is not a valid menu choice. Try again.\n"))
+                break
 
             for val in menu_dict:
 
@@ -173,9 +197,11 @@ def main_menu():
                             else:
                                 for p in p_list:
                                     if p.hero == "":
-                                        print(p.name, "has yet to choose a hero!")
+                                        print(p.name, "has not selected hero")
+                                        conn.send(str.encode(p.name + " has yet to choose a hero!\n"))
                         else:
-                            print("You must select a map before starting the game!")
+                            conn.send(str.encode("You have yet to choose a map!\n"))
+                            print("Error: no map chosen")
 
                     elif val == "Player List":
                         menu_dict[val][2](p_list)
@@ -204,9 +230,11 @@ def main_menu():
                                 p_list.append(player4)
                     else:
                         menu_dict[val][2]()
-
         except ValueError:
-            print("Please enter a number.")
+            print("ValueError in main_menu.")
+            conn.send(str.encode("That is not a number. Please enter a valid menu choice.\n"))
+        except TypeError:
+            print("TypeError in main_menu.")
 
 
 def init_game(player_list, map_choice):
@@ -333,8 +361,23 @@ player_dummy.hero.current_energy = 4
 # card = player_dummy.choose_card()
 # print("the card chosen was", card.name)
 
+"""
+clients = {}
+addresses = {}
+ADDR = (HOST, PORT)
+SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+SERVER.bind(ADDR)
+"""
 
-main_menu()
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind((HOST, PORT))
+    s.listen(5)
+    print("Waiting for connection...")
+    conn, addr = s.accept()
+    print('Connected by', addr)
+    with conn:
+        while True:
+            main_menu()
 
 
 # Destroy all creatures
