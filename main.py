@@ -1,23 +1,20 @@
 import random
 import time
 import socket
-from card import *
 from creature import *
 from player import *
-from threading import Thread
+from threading import *
 
 HOST = ""  # Standard loopback interface address (localhost)
 PORT = 55555        # Port to listen on (non-privileged ports are > 1023)
 
 
-def handle_input():
+def handle_input(conn):
     data = conn.recv(2048)
-    # reply = addr[0] + " says: " + data.decode("utf-8")
-    # conn.sendall(str.encode(reply))
     return data
 
 
-def choose_map():
+def choose_map(conn):
     while True:
         maps = ("Choose your map!\n"
                 "\t1. Acid Woods\n"
@@ -27,7 +24,7 @@ def choose_map():
         conn.send(str.encode(maps))
         # Something goes here to either fetch map generation or just make fancy name print
         try:
-            map_choice = int(handle_input())
+            map_choice = int(handle_input(conn))
             if map_choice > 0:
                 if map_choice < 5:
                     print("player chose map", map_choice)
@@ -42,7 +39,7 @@ def choose_map():
             conn.send(str.encode("That is not a map. Try again.\n"))
 
 
-def choose_hero(player):
+def choose_hero(conn, player):
     while True:
         x = 0
         for hero in hero_list:
@@ -52,7 +49,7 @@ def choose_hero(player):
         print(str(x+1)+". Random Hero")
         conn.send(str.encode(str(x+1)+". Random Hero\n"))
         try:
-            hero_choice = int(handle_input())
+            hero_choice = int(handle_input(conn))
             if hero_choice == 1:
                 player.hero = Hero("Jarax", 30, 2, 3, 1, 4, "berzerk", "Brute", 999, 0)
                 player.deck = jarax_deck
@@ -91,12 +88,12 @@ def choose_hero(player):
             conn.send(str.encode("That is not a valid choice. Try again.\n"))
 
 
-def choose_num_heroes():  # Needs to be rewritten to account for connection of new players
+def choose_num_heroes(conn):  # Needs to be rewritten to account for connection of new players
     while True:
         print("You can play up to 4 players at one time. How many players do you want?")
         conn.send(str.encode("You can play up to 4 players at one time. How many players do you want?"))
         try:
-            num_heroes = int(handle_input())
+            num_heroes = int(handle_input(conn))
             if num_heroes >= 2:
                 if num_heroes > 2:
                     if num_heroes < 5:
@@ -119,17 +116,19 @@ def choose_num_heroes():  # Needs to be rewritten to account for connection of n
     return num_heroes
 
 
-def show_player_list(p_list):  # Needs to be rewritten to account for new players
+def show_player_list(conn, p_list):  # Needs to be rewritten to account for new players
     print("Player list:")
     for p in p_list:
         print(p.name)
         if p.hero is not "":
             print("Hero:", p.hero.name + "\n")
+            conn.send(str.encode("Hero: " + p.hero.name + "\n"))
         else:
             print(p.name, "has not selected a Hero yet.\n")
+            conn.send(str.encode(p.name + " has not selected a Hero yet.\n"))
 
 
-def main_menu():
+def main_menu(conn):
     p_list = [player1, player2]
     map_choice = 0  # Default
 
@@ -143,6 +142,7 @@ def main_menu():
         "Num of Heroes": [1100, "Choose number of Heroes", choose_num_heroes],
         "Player List": [154, "Show List of Players", show_player_list],
         "Quit": [6871, "Quit", quit],
+        "Add Player": [5312, "Add Player", Connector.add_player]
     }
 
     # Should there be neutral deck choices?
@@ -172,10 +172,24 @@ def main_menu():
         for val in menu_dict:
             if menu_dict[val][0] < 100:  # Doesn't show 'hidden' options (with arbitrarily high values)
                 dummy_handler += 1
-                print(str(menu_dict[val][0])+".", menu_dict[val][1])
-                conn.send(str.encode(str(menu_dict[val][0])+". " + menu_dict[val][1] + "\n"))
+                if val.endswith("Hero"):
+                    for obj in p_list:
+                        if obj.hero == "":
+                            print(str(menu_dict[val][0]) + ".", menu_dict[val][1])
+                            conn.send(str.encode(str(menu_dict[val][0])+". "
+                                                 + menu_dict[val][1] + "\n"))
+                            print(obj.name, "added this to menu list.")
+                        else:
+                            print(str(menu_dict[val][0]) + ".", menu_dict[val][1],
+                                  "\t- [x]\t", obj.hero.name)
+                            conn.send(str.encode(str(menu_dict[val][0]) + ". " + str(menu_dict[val][1])
+                                                 + "\t- [x]\t" + obj.hero.name + "\n"))
+                            print(obj.name, "added this to menu list.")
+                else:
+                    print(str(menu_dict[val][0])+".", menu_dict[val][1])
+                    conn.send(str.encode(str(menu_dict[val][0])+". " + menu_dict[val][1] + "\n"))
         try:
-            usr_choice = int(handle_input())
+            usr_choice = int(handle_input(conn))
             if usr_choice > dummy_handler:
                 conn.send(str.encode("That is not a valid menu choice. Try again.\n"))
                 break
@@ -193,7 +207,7 @@ def main_menu():
                                 else:
                                     p_number += 1
                             if p_number == len(p_list):
-                                init_game(p_list, map_choice)
+                                init_game(conn, p_list, map_choice)
                             else:
                                 for p in p_list:
                                     if p.hero == "":
@@ -204,30 +218,32 @@ def main_menu():
                             print("Error: no map chosen")
 
                     elif val == "Player List":
-                        menu_dict[val][2](p_list)
+                        menu_dict[val][2](conn, p_list)
 
                     elif val == "Map":
-                        map_choice = menu_dict[val][2]()
+                        map_choice = menu_dict[val][2](conn)
                         print("map chosen is", map_choice)
                     elif menu_dict[val][2] is choose_hero:
                         # return_value = menu_dict[val][2]()
                         if val == "Player #1 Hero":
-                            choose_hero(player1)
+                            choose_hero(conn, player1)
                         elif val == "Player #2 Hero":
-                            choose_hero(player2)
+                            choose_hero(conn, player2)
                         elif val == "Player #3 Hero":
-                            choose_hero(player3)
+                            choose_hero(conn, player3)
                         elif val == "Player #4 Hero":
-                            choose_hero(player4)
+                            choose_hero(conn, player4)
                         else:
                             print("ended in else for resolution for choose hero")
                     elif val == "Num of Heroes":
-                        return_value = menu_dict[val][2]()
+                        return_value = menu_dict[val][2](conn)
                         p_list = [player1, player2]
-                        if return_value >= 3:
+                        if return_value >= 3:  # False alarm, return_val is always int for this choice
                             p_list.append(player3)
                             if return_value == 4:
                                 p_list.append(player4)
+                    elif val == "Add Player":
+                        connecter.add_player()
                     else:
                         menu_dict[val][2]()
         except ValueError:
@@ -237,7 +253,7 @@ def main_menu():
             print("TypeError in main_menu.")
 
 
-def init_game(player_list, map_choice):
+def init_game(conn, player_list, map_choice):
     print("I am the initiation!")
 
     # init_list = []
@@ -255,23 +271,22 @@ def init_game(player_list, map_choice):
         player.draw_card()
         player.draw_card()
         for card in player.hand:
-            print(player.name, "has drawn", card.name + ".")
-        print("")
+            conn.send(str.encode(player.name + " has drawn " + card.name + ".\n"))
 
     # for player in player_list:
         # choose start loc
 
         # draw 4 cards
 
-    game_turn(player_list, 0)
+    game_turn(conn, player_list, 0)
 
 
-def game_turn(player_list, turn_count):  # Also needs to receive map.
+def game_turn(conn, player_list, turn_count):  # Also needs to receive map.
     while True:
         turn_count += 1
         print("\t\tTURN", turn_count)
+        conn.sendall(str.encode("\t\tTURN " + str(turn_count) + "!\n"))
 
-        resolve_order = []
         """Make list contain all resolve effects (offer cards etc).
         Loop through, and when one action is done, delete (pop) from list
         Loop is broken if interrupted but will not replay events it should already have done"""
@@ -283,31 +298,37 @@ def game_turn(player_list, turn_count):  # Also needs to receive map.
         """
 
         for player in player_list:
-            print("")
-            print(player.name+", it is your turn.")
-            print(player.name+", you have", player.hero.current_energy, player.hero.energy_type+".")
-            resolve_order.append(offer_cards(player_list))
+            resolve_order = [draw_card, "maintenance", "generate_resources", "movementattacks", "resolve cards"]
+            print("I have entered the turn order. Resolve order is:", resolve_order)
+            conn.send(str.encode(player.name + ", it is your turn.\n"))
+            conn.send(str.encode(player.name + ", you have " +
+                                 str(player.hero.current_energy) + " " +
+                                 player.hero.energy_type+".\n"))
 
-            player.draw_card()
-            print(player.name, "has drawn", player.hand[-1].name + ".")
+            while len(resolve_order) > 0:
+                print("It should be time for", player.name, "to", str(resolve_order[0]) + ".")
+                if resolve_order[0] == draw_card:
+                    player.draw_card()
+                    print(player.name, "has drawn a card.")
+                    conn.sendall(str.encode(player.name + " has drawn a card.\n"))
 
-            # offer_cards(player_list)
+                elif resolve_order[0] == "generate_resources":
+                    player.hero.generate_resources(conn, player)
+                    print(player.name, "has generated resources.")
+                    conn.sendall(str.encode(player.name + " has generated resources.\n"))
 
-            print("This is where start-of-turn (maintenance) effects should occur.")
+                elif type(resolve_order[0]) == str:
+                    print("This is when", resolve_order[0], "should occur.")
+                    conn.sendall(str.encode("This is when " + str(resolve_order[0]) + " should occur\n"))
+                else:
+                    print("I have entered the ELSE. Resolve order 0 is", resolve_order[0])
 
-            # offer_cards(player_list)
+                time.sleep(1.3)
+                resolve_order.pop(0)
 
-            player.hero.generate_resources(player)
-
-            # offer_cards(player_list)
-
-            # Movement + Attacks
-
-            # offer_cards(player_list)
-
-            # Resolve all effects
-
+            time.sleep(1.2)
             print("End of turn.")
+            conn.sendall(str.encode("End of " + player.name + "'s turn.\n"))
             print(player.name, "currently has", player.hero.current_energy, player.hero.energy_type+".")
             print("")
 
@@ -319,7 +340,7 @@ def game_turn(player_list, turn_count):  # Also needs to receive map.
             break
 
 
-def offer_cards(player_list):
+def offer_cards(conn, player_list):
     return_list = []
     for player in player_list:
         x = 0
@@ -334,7 +355,7 @@ def offer_cards(player_list):
                 print(player.name + ", do you want to play any cards?"
                                     "\n[Y]es to play cards."
                                     "\n[V]iew cards to view cards")
-                inp = handle_input()
+                inp = handle_input(conn)
                 inp = inp.lower()[:1]
                 if inp == "y":
                     card = player.choose_card()
@@ -362,22 +383,60 @@ player_dummy.hero.current_energy = 4
 # print("the card chosen was", card.name)
 
 """
-clients = {}
-addresses = {}
-ADDR = (HOST, PORT)
-SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-SERVER.bind(ADDR)
+def handle_client(client):  # Takes client socket as argument.
+    # Handles a single client connection.
+    name = "billy"
+    welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
+    client.send(bytes(welcome, "utf8"))
+    msg = "%s has joined the chat!" % name
+    client.sendall(str.encode(msg))
+    clients[client] = name
+    while True:
+        msg = client.recv(2048)
+        if msg != bytes("{quit}", "utf8"):
+            client.sendall(str.encode(name + ": " + msg))
+        else:
+            client.send(bytes("{quit}", "utf8"))
+            client.close()
+            del clients[client]
+            client.sendall(str.encode("%s has left the game." % name))
+            break
 """
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen(5)
-    print("Waiting for connection...")
-    conn, addr = s.accept()
-    print('Connected by', addr)
-    with conn:
-        while True:
-            main_menu()
+
+class Connector(Thread):
+    def run(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+            server.bind((HOST, PORT))
+            server.listen(1)
+            print("Waiting for connection...")
+            client, client_address = server.accept()
+            print(client_address, "has joined.")
+            with client:
+                while True:
+                    print("Player conn list:", clients)
+                    main_menu(client)
+
+    def add_player(self):
+        print("I managed to enter additional player.")
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+            server.bind((HOST, 55554))
+            print("I have bound myself.")
+            server.listen(1)
+            print("Waiting for connection...")
+            client, client_address = server.accept()
+            addresses[client] = client_address
+            # clients.append(conn2)
+            print(client_address, "has joined.")
+            server.sendall(str.encode("Welcome," + client_address))
+            # Thread(target=handle_client, args=(client,)).start()
+
+
+clients = {}
+addresses = {}
+connecter = Connector()
+
+connecter.start()
 
 
 # Destroy all creatures
@@ -392,4 +451,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 # force movement
 # heal
 # destroy target equipment
-#
