@@ -37,16 +37,13 @@ class Hero(Creature):
         elif hero_class == "Expert":
             self.energy_type = "Action Points"
 
-    def generate_resources(self, player):
-        temp = self.current_energy
+    def generate_resources(self):
         if self.hero_class == "Adept":
             self.current_energy += self.energy_regen
         elif self.hero_class == "Expert":
             self.current_energy = self.energy_regen
         if self.current_energy > self.energy_cap and self.hero_class is not "Brute":
             self.current_energy = self.energy_cap
-        if self.current_energy > temp:
-            print(player.name, "has gained", self.current_energy-temp, self.energy_type+".")
 
 
 hero_jarax = Hero("Jarax", 30, 2, 3, 1, 4, "berzerk", "Brute", 999, 0)
